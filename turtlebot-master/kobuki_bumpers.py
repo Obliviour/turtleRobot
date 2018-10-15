@@ -49,7 +49,7 @@ class kobuki_bumper():
                 rospy.init_node("kobuki_bumper")                
 
                 #monitor kobuki's button events
-        rospy.Subscriber('mobile_base/events/bumper',BumperEvent,self.BumperEventCallback)
+                rospy.Subscriber('mobile_base/events/bumper',BumperEvent,self.BumperEventCallback)
 
                 #rospy.Subscriber("/mobile_base/events/button",ButtonEvent,self.ButtonEventCallback)
 
