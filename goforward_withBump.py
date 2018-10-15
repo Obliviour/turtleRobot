@@ -27,8 +27,8 @@ from kobuki_msgs.msg import WheelDropEvent
 from geometry_msgs.msg import Twist
 import time
 
-bump_hit = 0
-wheel = 0
+#bump_hit = 0
+#wheel = 0
 
 class GoForward():
     def __init__(self):
@@ -47,10 +47,12 @@ class GoForward():
            
         #Subscribe to Bumper Events
         rospy.Subscriber('mobile_base/events/bumper',BumperEvent,self.BumperEventCallback)
+	self.bump_hit = 0	
 
         #Subscribe to Wheel Drop Events
         rospy.Subscriber('mobile_base/events/wheel_drop',WheelDropEvent,self.WheelDropEventCallback)
-
+	self.wheel = 0
+	
         #TurtleBot will stop if we don't keep telling it to move.  How often should we tell it to move? 10 HZ
         r = rospy.Rate(10);
 
@@ -69,35 +71,39 @@ class GoForward():
         # as long as you haven't ctrl + c keeping doing...
         while not rospy.is_shutdown():
             if(curr_state == 0): #Go_Forward
-                self.cmd_vel.publish(move_cmd)
-                if(bump_hit == 1):
+                #print(0)
+		self.cmd_vel.publish(move_cmd)
+                if(self.bump_hit == 1):
                     next_state = 1 #Go to Wait_For_Button
-                elif(wheel == 1):
+                elif(self.wheel == 1):
                     next_state = 2 #Go to Wait_For_Wheel
                 else:
                     next_state = 0 #Stay in current state
             elif(curr_state == 1): #Wait_For_Button
-                self.cmd_vel.publish(stop_cmd)
-                if(bump_hit == 0):
+                #print(1)
+		self.cmd_vel.publish(stop_cmd)
+                if(self.bump_hit == 0):
                     t0 = time.time() #start timer
                     next_state = 3 #Go to Count_Time
                 else:
                     next_state = 1 #Stay in current state
             elif(curr_state == 2): #Wait_For_Wheel
-                self.cmd_vel.publish(stop_cmd)
-                if(wheel == 0):
+                #print(2)
+		self.cmd_vel.publish(stop_cmd)
+                if(self.wheel == 0):
                     t0 = time.time() #start timer
                     next_state = 3 #Go to Count_Time 
                 else:
                     next_state = 2 #Stay in current state
             elif(curr_state == 3): #Count_Time
-                self.cmd_vel.publish(stop_cmd)
+                #print(3)
+		self.cmd_vel.publish(stop_cmd)
                 t1 = time.time()
                 if((t1 - t0) >= 2):
                     next_state = 0 #Go to Go_Forward
-                elif(bump_hit == 1):
+                elif(self.bump_hit == 1):
                     next_state = 1 #Go to Wait_For_Button
-                elif(wheel == 1):
+                elif(self.wheel == 1):
                     next_state = 2 #Go to Wait_For_Wheel
                 else:
                     next_state = 3 #Stay in current state
@@ -119,16 +125,18 @@ class GoForward():
         rospy.sleep(1)
 
     def WheelDropEventCallback(self,data):
-        if(data.state == WheelDropEvent.RAISED):
-            wheel = 1
+	#print(data.state)
+        if(data.state == WheelDropEvent.DROPPED):
+            self.wheel = 1
         else:
-            wheel = 0
+            self.wheel = 0
  
     def BumperEventCallback(self,data):
-        if(data.state == BumperEvent.PRESSED):
-            bump_hit = 1
+        #print(data.state)
+	if(data.state == BumperEvent.PRESSED):
+            self.bump_hit = 1
         else:
-            bump_hit = 0
+            self.bump_hit = 0
 
 if __name__ == '__main__':
         GoForward()
