@@ -71,7 +71,6 @@ class GoForward():
         # as long as you haven't ctrl + c keeping doing...
         while not rospy.is_shutdown():
             if(curr_state == 0): #Go_Forward
-                #print(0)
 		self.cmd_vel.publish(move_cmd)
                 if(self.bump_hit == 1):
                     next_state = 1 #Go to Wait_For_Button
@@ -80,7 +79,6 @@ class GoForward():
                 else:
                     next_state = 0 #Stay in current state
             elif(curr_state == 1): #Wait_For_Button
-                #print(1)
 		self.cmd_vel.publish(stop_cmd)
                 if(self.bump_hit == 0):
                     t0 = time.time() #start timer
@@ -88,7 +86,6 @@ class GoForward():
                 else:
                     next_state = 1 #Stay in current state
             elif(curr_state == 2): #Wait_For_Wheel
-                #print(2)
 		self.cmd_vel.publish(stop_cmd)
                 if(self.wheel == 0):
                     t0 = time.time() #start timer
@@ -96,7 +93,6 @@ class GoForward():
                 else:
                     next_state = 2 #Stay in current state
             elif(curr_state == 3): #Count_Time
-                #print(3)
 		self.cmd_vel.publish(stop_cmd)
                 t1 = time.time()
                 if((t1 - t0) >= 2):
