@@ -23,16 +23,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 import rospy
 from kobuki_msgs.msg import BumperEvent
+from kobuki_msgs.msg import WheelDropEvent
 from geometry_msgs.msg import Twist
+import time
 
+bump_hit = 0
+wheel = 0
 
 class GoForward():
     def __init__(self):
         # initiliaze
         print('Start')
         rospy.init_node('GoForward', anonymous=False)
-
-        self.bump_hit = 0
 
         # tell user how to stop TurtleBot
         rospy.loginfo("To stop TurtleBot CTRL + C")
@@ -41,16 +43,15 @@ class GoForward():
         rospy.on_shutdown(self.shutdown)
         
         # Create a publisher which can "talk" to TurtleBot and tell it to move
-        # Tip: You may need to change cmd_vel_mux/input/navi to /cmd_vel if you're not using TurtleBot2
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
-     
-        print("Viccy B")        
-        #rospy.init_node('temp_state', anonymous=False)
+           
+        #Subscribe to Bumper Events
         rospy.Subscriber('mobile_base/events/bumper',BumperEvent,self.BumperEventCallback)
 
-        print('Got here')
-        #TurtleBot will stop if we don't keep telling it to move.  How often should we tell it to move? 10 HZ
+        #Subscribe to Wheel Drop Events
+        rospy.Subscriber('mobile_base/events/wheel_drop',WheelDropEvent,self.WheelDropEventCallback)
 
+        #TurtleBot will stop if we don't keep telling it to move.  How often should we tell it to move? 10 HZ
         r = rospy.Rate(10);
 
         # Twist is a datatype for velocity
@@ -60,15 +61,51 @@ class GoForward():
         # let's turn at 0 radians/s
         move_cmd.angular.z = 0
 
+        stop_cmd = Twist()
+
+        curr_state = 0
+        next_state = 0
+
         # as long as you haven't ctrl + c keeping doing...
         while not rospy.is_shutdown():
-            print('a;lnkkl;n')
-            if (self.bump_hit==1):
+            if(curr_state == 0): #Go_Forward
+                self.cmd_vel.publish(move_cmd)
+                if(bump_hit == 1):
+                    next_state = 1 #Go to Wait_For_Button
+                elif(wheel == 1):
+                    next_state = 2 #Go to Wait_For_Wheel
+                else:
+                    next_state = 0 #Stay in current state
+            elif(curr_state == 1): #Wait_For_Button
+                self.cmd_vel.publish(stop_cmd)
+                if(bump_hit == 0):
+                    t0 = time.time() #start timer
+                    next_state = 3 #Go to Count_Time
+                else:
+                    next_state = 1 #Stay in current state
+            elif(curr_state == 2): #Wait_For_Wheel
+                self.cmd_vel.publish(stop_cmd)
+                if(wheel == 0):
+                    t0 = time.time() #start timer
+                    next_state = 3 #Go to Count_Time 
+                else:
+                    next_state = 2 #Stay in current state
+            elif(curr_state == 3): #Count_Time
+                self.cmd_vel.publish(stop_cmd)
+                t1 = time.time()
+                if((t1 - t0) >= 2):
+                    next_state = 0 #Go to Go_Forward
+                elif(bump_hit == 1):
+                    next_state = 1 #Go to Wait_For_Button
+                elif(wheel == 1):
+                    next_state = 2 #Go to Wait_For_Wheel
+                else:
+                    next_state = 3 #Stay in current state
+            else:
+                next_state = 0 #Something went wrong
 
-                rospy.loginfo("sehejjy is life")
-                self.shutdown()
-            # publish the velocity
-            self.cmd_vel.publish(move_cmd)
+
+            curr_state = next_state
             # wait for 0.1 seconds (10 HZ) and publish again
             r.sleep()
                         
@@ -80,10 +117,18 @@ class GoForward():
         self.cmd_vel.publish(Twist())
         # sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
         rospy.sleep(1)
+
+    def WheelDropEventCallback(self,data):
+        if(data.state == WheelDropEvent.RAISED):
+            wheel = 1
+        else:
+            wheel = 0
  
     def BumperEventCallback(self,data):
         if(data.state == BumperEvent.PRESSED):
-                self.bump_hit = 1
+            bump_hit = 1
+        else:
+            bump_hit = 0
 
 if __name__ == '__main__':
         GoForward()
