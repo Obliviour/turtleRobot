@@ -45,7 +45,7 @@ from kobuki_msgs.msg import ButtonEvent
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion, Twist
 import cmath
-
+import math
 
 class GoStraight():
     def __init__(self):
@@ -76,16 +76,20 @@ class GoStraight():
         #self.r = rospy.Rate(20)
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         current_orientation = msg.pose.pose.orientation
-	angle = current_orientation.w 
-	angle = angle**2
-        zcur = cmath.rect(1, angle)
+	#print(current_orientation.y)
+	#print(current_orientation.x)
+	#print(current_orientation.z)
+	mag = 1 if(current_orientation.z >= 0) else -1
+	angle = current_orientation.w
+	angle = (angle**2)*mag
+        zcur = cmath.rect(1,angle)
         if (self.isFirstRun):
 	    self.zdes = cmath.rect(1, angle)
 	    self.isFirstRun = 0	
         zerr = self.zdes/zcur
         phase_err = cmath.phase(zerr)
         w = self.adjustPhase(phase_err)
-        rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle, phase_err,w))
+        rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
         # Twist is a datatype for velocity
         error_cmd = Twist()
         error_cmd.linear.x = 0.2
@@ -105,7 +109,7 @@ class GoStraight():
         
         
     def adjustPhase(self, phase_err):
-        k_turn = 5
+        k_turn = 2.5
         w = phase_err * k_turn
         wmax = 3.14
         w = self.saturation(w, wmax)
