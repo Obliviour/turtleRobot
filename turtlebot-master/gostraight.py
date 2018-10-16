@@ -46,26 +46,19 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion, Twist
 import cmath
 
+
 class GoStraight():
     def __init__(self):
         # initiliaze
         rospy.init_node('GoStraight', anonymous=False)
         # rospy.init_node('CheckOdometry', anonymous=False)
-        # we want a straight line with a phase of 0
-        self.zdes = rec(1,0)
-        odom = rospy.Subscriber('/odom', Odometry, self.OdometryCallBack)
+        # we want a straight line with a phase of straight
+        odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         # tell user how to stop TurtleBot
+	self.isFirstRun = 1
         rospy.loginfo("To stop TurtleBot CTRL + C")
 
-        # What function to call when you ctrl + c    
-        rospy.on_shutdown(self.shutdown)
         
-        # Create a publisher which can "talk" to TurtleBot and tell it to move
-        # Tip: You may need to change cmd_vel_mux/input/navi to /cmd_vel if you're not using TurtleBot2
-        self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
-     
-        #TurtleBot will stop if we don't keep telling it to move.  How often should we tell it to move? 10 HZ
-        r = rospy.Rate(10);
 
         # # as long as you haven't ctrl + c keeping doing...
         # while not rospy.is_shutdown():
@@ -77,18 +70,22 @@ class GoStraight():
             # r.sleep()
         
         #rospy.spin() tells the program to not exit until you press ctrl + c.  If this wasn't there... it'd subscribe and then immediatly exit (therefore stop "listening" to the thread).
-		rospy.spin();
+	rospy.spin()
         
     def OdometryCallBack(self, msg):
-
+        #self.r = rospy.Rate(20)
+        self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         current_orientation = msg.pose.pose.orientation
-        angle = current_orientation.w 
-        angle = angle**2
-        zcur = cmath(1, angle)
+	angle = current_orientation.w 
+	angle = angle**2
+        zcur = cmath.rect(1, angle)
+        if (self.isFirstRun):
+	    self.zdes = cmath.rect(1, angle)
+	    self.isFirstRun = 0	
         zerr = self.zdes/zcur
         phase_err = cmath.phase(zerr)
         w = self.adjustPhase(phase_err)
-        
+        rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle, phase_err,w))
         # Twist is a datatype for velocity
         error_cmd = Twist()
         error_cmd.linear.x = 0.2
@@ -96,9 +93,9 @@ class GoStraight():
         
         self.cmd_vel.publish(error_cmd)
         
-        r.sleep()
+        #self.r.sleep()
         
-        # # Twist is a datatype for velocity
+         # Twist is a datatype for velocity
         # move_cmd = Twist()
         # move_cmd.linear.x = 0.2
         # move_cmd.angular.z = 0
@@ -107,9 +104,9 @@ class GoStraight():
         # time.sleep(2)
         
         
-    def adjustPhase(self):
-        k_turn = .2
-        w = self.phase_err * k_turn
+    def adjustPhase(self, phase_err):
+        k_turn = 5
+        w = phase_err * k_turn
         wmax = 3.14
         w = self.saturation(w, wmax)
         return w
@@ -126,8 +123,8 @@ class GoStraight():
 
  
 if __name__ == '__main__':
-    try:
-        GoStraight()
-    except:
-        rospy.loginfo("GoForward node terminated.")
+    #try:
+    GoStraight()
+    #except:
+    #    rospy.loginfo("GoForward node terminated.")
 
