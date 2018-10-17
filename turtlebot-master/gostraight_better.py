@@ -55,7 +55,7 @@ class GoStraight():
         # we want a straight line with a phase of straight
         odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         # tell user how to stop TurtleBot
-    self.isFirstRun = 1
+    	self.isFirstRun = 1
         rospy.loginfo("To stop TurtleBot CTRL + C")
 
         
@@ -70,7 +70,7 @@ class GoStraight():
             # r.sleep()
         
         #rospy.spin() tells the program to not exit until you press ctrl + c.  If this wasn't there... it'd subscribe and then immediatly exit (therefore stop "listening" to the thread).
-    rospy.spin()
+    	rospy.spin()
         
     def OdometryCallBack(self, msg):
         #self.r = rospy.Rate(20)
@@ -81,11 +81,11 @@ class GoStraight():
         #print(current_orientation.z)
         w = current_orientation.w
         y = current_orientation.y
-        angle = 2*atan2(y,w)
+        angle = 2*math.atan2(y,w)
         zcur = cmath.rect(1,angle)
         if (self.isFirstRun):
-        self.zdes = cmath.rect(1, angle)
-        self.isFirstRun = 0 
+        	self.zdes = cmath.rect(1, angle)
+        	self.isFirstRun = 0 
         zerr = self.zdes/zcur
         phase_err = cmath.phase(zerr)
         w = self.adjustPhase(phase_err)
