@@ -80,8 +80,8 @@ class GoStraight():
         #print(current_orientation.x)
         #print(current_orientation.z)
         w = current_orientation.w
-        y = current_orientation.y
-        angle = 2*math.atan2(y,w)
+        z = current_orientation.z
+        angle = 2*math.atan2(z,w)
         zcur = cmath.rect(1,angle)
         if (self.isFirstRun):
         	self.zdes = cmath.rect(1, angle)
