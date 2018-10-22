@@ -7,8 +7,8 @@ def getAngle():
     #rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
     	angle = input("Enter an Angle in Degrees from 0 to 360: ")
-    	if(angle > 360 || angle < 0):
-    		angle = angle % 360
+    	#if(angle > 360 or angle < 0):
+    	angle = angle % 360
         pub.publish(angle)
         #rate.sleep()
 

@@ -88,10 +88,10 @@ class GoStraight():
         z = current_orientation.z
         angle = 2*math.atan2(z,w)
         zcur = cmath.rect(1,angle)
-        if (self.isFirstRun):
+        #if (self.isFirstRun):
             # Set zdes to a certain value
-            self.zdes = cmath.rect(1, objective_angle)
-            self.isFirstRun = 0 
+        self.zdes = cmath.rect(1, self.objective_angle)
+        #self.isFirstRun = 0 
         zerr = self.zdes/zcur
         phase_err = cmath.phase(zerr)
         w = self.adjustPhase(phase_err)
@@ -134,8 +134,9 @@ class GoStraight():
             w = - wmax
         return w
         
-    def UpdateAngle(self, msg)
-        self.objective_angle = int(msg.data)        
+    def UpdateAngle(self, msg):
+        print(msg.data)
+	self.objective_angle = math.pi*int(msg.data)/180        
 
  
 if __name__ == '__main__':
