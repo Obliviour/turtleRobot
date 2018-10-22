@@ -85,15 +85,16 @@ class GoStraight():
         zcur = cmath.rect(1,angle)
         if (self.isFirstRun):
             # Set zdes to a certain value
-        	self.zdes = cmath.rect(1, objective_angle)
-        	self.isFirstRun = 0 
+	    objective_angle = -90
+            self.zdes = cmath.rect(1, objective_angle)
+            self.isFirstRun = 0 
         zerr = self.zdes/zcur
         phase_err = cmath.phase(zerr)
         w = self.adjustPhase(phase_err)
         rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
         # Twist is a datatype for velocity
         range = 0
-        if (zerr <= range):
+        if (cmath.phase(zerr) == range):
             error_cmd = Twist()
             error_cmd.linear.x = 0
             error_cmd.angular.z = 0
