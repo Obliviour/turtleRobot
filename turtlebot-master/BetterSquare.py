@@ -119,7 +119,7 @@ class BetterSquare():
             zerr = self.zdes/zcur
             phase_err = cmath.phase(zerr)
             w = self.adjustPhase(phase_err)
-            #rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
+            rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
             # Twist is a datatype for velocity
             range = 0
             if (cmath.phase(zerr) == range):
