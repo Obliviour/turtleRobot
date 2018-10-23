@@ -36,9 +36,12 @@ class BetterSquare():
         
         #rospy.spin() tells the program to not exit until you press ctrl + c.  If this wasn't there... it'd subscribe and then immediatly exit (therefore stop "listening" to the thread).
     	rospy.spin()
+	
+	curr_state = 0
 
         while True:
-            if(curr_state == 0): #Rotate to Angle
+            print(curr_state)
+	    if(curr_state == 0): #Rotate to Angle
                 t0 = time.time()
                 self.enableRotate = 1
                 next_state = 1
