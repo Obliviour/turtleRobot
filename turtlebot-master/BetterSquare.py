@@ -16,6 +16,7 @@ class BetterSquare():
         odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         # tell user how to stop TurtleBot
         rospy.loginfo("To stop TurtleBot CTRL + C")
+        rospy.on_shutdown(self.shutdown)
 
         self.isFirstRun = 1
         self.enableDrive = 0
@@ -39,7 +40,7 @@ class BetterSquare():
 	
 	curr_state = 0
 
-        while True:
+        while not rospy.is_shutdown():
             print(curr_state)
 	    if(curr_state == 0): #Rotate to Angle
                 t0 = time.time()
@@ -66,6 +67,14 @@ class BetterSquare():
                 else:
                     next_state = 3
             curr_state = next_state
+
+    def shutdown(self):
+        # stop turtlebot
+        rospy.loginfo("Stop TurtleBot")
+        # a default Twist has linear.x of 0 and angular.z of 0.  So it'll stop TurtleBot
+        self.cmd_vel.publish(Twist())
+        # sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
+        rospy.sleep(1)
 
         
     def OdometryCallBack(self, msg):
