@@ -24,7 +24,7 @@ class BetterSquare():
         self.objective_angle = 0
 
         rotateTime = 1.5
-        driveTime = 2
+        driveTime = 3
 
         # # as long as you haven't ctrl + c keeping doing...
         # while not rospy.is_shutdown():
@@ -36,12 +36,12 @@ class BetterSquare():
             # r.sleep()
         
         #rospy.spin() tells the program to not exit until you press ctrl + c.  If this wasn't there... it'd subscribe and then immediatly exit (therefore stop "listening" to the thread).
-    	rospy.spin()
+    	#rospy.spin()
 	
 	curr_state = 0
 
         while not rospy.is_shutdown():
-            print(curr_state)
+            #print(curr_state)
 	    if(curr_state == 0): #Rotate to Angle
                 t0 = time.time()
                 self.enableRotate = 1
@@ -51,7 +51,8 @@ class BetterSquare():
                 if((t1-t0)>=rotateTime):
                     self.enableRotate = 0
                     self.objective_angle = (self.objective_angle + 90) % 360
-                    next_state = 2
+                    print(self.objective_angle)
+		    next_state = 2
                 else:
                     next_state = 1
             elif(curr_state == 2): #Start Drive
