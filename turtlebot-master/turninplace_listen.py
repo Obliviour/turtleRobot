@@ -136,7 +136,7 @@ class GoStraight():
         
     def UpdateAngle(self, msg):
         print(msg.data)
-	self.objective_angle = math.pi*int(msg.data)/180        
+	    self.objective_angle = math.pi*int(msg.data)/180        
 
  
 if __name__ == '__main__':

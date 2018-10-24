@@ -51,6 +51,7 @@ class BetterSquare():
                 if((t1-t0)>=rotateTime):
                     self.enableRotate = 0
                     self.objective_angle = (self.objective_angle + 90) % 360
+                    self.objective_angle * math.pi / 180
                     print(self.objective_angle)
 		    next_state = 2
                 else:
