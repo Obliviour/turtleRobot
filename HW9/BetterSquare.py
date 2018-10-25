@@ -19,6 +19,7 @@ class BetterSquare():
         rospy.on_shutdown(self.shutdown)
 
         self.isFirstRun = 1
+        self.gotOrigAngle = 0
         self.enableDrive = 0
         self.enableRotate = 0
         self.objective_angle = 0
@@ -38,11 +39,16 @@ class BetterSquare():
         #rospy.spin() tells the program to not exit until you press ctrl + c.  If this wasn't there... it'd subscribe and then immediatly exit (therefore stop "listening" to the thread).
     	#rospy.spin()
 	
-	curr_state = 0
+	curr_state = -1
 
         while not rospy.is_shutdown():
             #print(curr_state)
-	    if(curr_state == 0): #Rotate to Angle
+	        if(curr_state == -1):
+                if(self.gotOrigAngle):
+                    next_state = 0
+                else:
+                    next_state = -1
+            elif(curr_state == 0): #Rotate to Angle
                 t0 = time.time()
                 self.enableRotate = 1
                 next_state = 1
@@ -82,7 +88,17 @@ class BetterSquare():
     def OdometryCallBack(self, msg):
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         #self.r = rospy.Rate(20)
-        if(self.enableDrive):
+        if(not self.gotOrigAngle):
+            current_orientation = msg.pose.pose.orientation
+            #print(current_orientation.y)
+            #print(current_orientation.x)
+            #print(current_orientation.z)
+            w = current_orientation.w
+            z = current_orientation.z
+            angle = 2*math.atan2(z,w)
+            self.objective_angle = angle
+            self.gotOrigAngle = 1
+        elif(self.enableDrive):
             current_orientation = msg.pose.pose.orientation
             #print(current_orientation.y)
             #print(current_orientation.x)
