@@ -43,13 +43,15 @@ class BetterSquare():
 
         while not rospy.is_shutdown():
             #print(curr_state)
-	        if(curr_state == -1):
+	    if(curr_state == -1):
                 if(self.gotOrigAngle):
-                    next_state = 0
+                    #print(self.objective_angle)
+		    next_state = 0
                 else:
                     next_state = -1
             elif(curr_state == 0): #Start Drive
-                t0 = time.time()
+                print(self.objective_angle * 180 / (math.pi))
+		t0 = time.time()
                 self.enableDrive = 1
                 next_state = 1
             elif(curr_state == 1): #Count Time
@@ -57,6 +59,7 @@ class BetterSquare():
                 if((t1-t0)>=driveTime):
                     self.enableDrive = 0
                     self.isFirstRun = 1
+		    self.objective_angle = (self.objective_angle + math.pi/2) % (2*math.pi)
                     next_state = 2
                 else:
                     next_state = 1
@@ -68,10 +71,10 @@ class BetterSquare():
                 t1 = time.time()
                 if((t1-t0)>=rotateTime):
                     self.enableRotate = 0
-                    self.objective_angle = (self.objective_angle + math.pi/2) % (2*math.pi)
+                    #self.objective_angle = (self.objective_angle + math.pi/2) % (2*math.pi)
                     #self.objective_angle = self.objective_angle * math.pi / 180
-                    print(self.objective_angle)
-		            next_state = 0
+                    #print(self.objective_angle)
+		    next_state = 0
                 else:
                     next_state = 3
             curr_state = next_state
