@@ -50,8 +50,8 @@ class BetterSquare():
                 t1 = time.time()
                 if((t1-t0)>=rotateTime):
                     self.enableRotate = 0
-                    self.objective_angle = (self.objective_angle + 90) % 360
-                    self.objective_angle * math.pi / 180
+                    self.objective_angle = (self.objective_angle + math.pi/2) % (2*math.pi)
+                    #self.objective_angle = self.objective_angle * math.pi / 180
                     print(self.objective_angle)
 		    next_state = 2
                 else:
@@ -120,7 +120,7 @@ class BetterSquare():
             zerr = self.zdes/zcur
             phase_err = cmath.phase(zerr)
             w = self.adjustPhase(phase_err)
-            rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
+            #rospy.loginfo("destination angle: %f current angle: %f error: %f adjusted phase: %f"%(cmath.phase(self.zdes),angle,phase_err,w))
             # Twist is a datatype for velocity
             range = 0
             if (cmath.phase(zerr) == range):
