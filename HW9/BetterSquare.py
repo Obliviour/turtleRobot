@@ -48,30 +48,30 @@ class BetterSquare():
                     next_state = 0
                 else:
                     next_state = -1
-            elif(curr_state == 0): #Rotate to Angle
+            elif(curr_state == 0): #Start Drive
+                t0 = time.time()
+                self.enableDrive = 1
+                next_state = 1
+            elif(curr_state == 1): #Count Time
+                t1 = time.time()
+                if((t1-t0)>=driveTime):
+                    self.enableDrive = 0
+                    self.isFirstRun = 1
+                    next_state = 2
+                else:
+                    next_state = 1
+            elif(curr_state == 2): #Rotate to Angle
                 t0 = time.time()
                 self.enableRotate = 1
-                next_state = 1
-            elif(curr_state == 1): #Count time
+                next_state = 3
+            elif(curr_state == 3): #Count time
                 t1 = time.time()
                 if((t1-t0)>=rotateTime):
                     self.enableRotate = 0
                     self.objective_angle = (self.objective_angle + math.pi/2) % (2*math.pi)
                     #self.objective_angle = self.objective_angle * math.pi / 180
                     print(self.objective_angle)
-		    next_state = 2
-                else:
-                    next_state = 1
-            elif(curr_state == 2): #Start Drive
-                t0 = time.time()
-                self.enableDrive = 1
-                next_state = 3
-            elif(curr_state == 3): #Count Time
-                t1 = time.time()
-                if((t1-t0)>=driveTime):
-                    self.enableDrive = 0
-                    self.isFirstRun = 1
-                    next_state = 0
+		            next_state = 0
                 else:
                     next_state = 3
             curr_state = next_state
