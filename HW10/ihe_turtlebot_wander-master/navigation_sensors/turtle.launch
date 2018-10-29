@@ -1,0 +1,4 @@
+<launch>
+    <param name = "port" command ="roslaunch turtlebot_bringup minimal.launch" />
+    <param name = "port" command ="roslaunch turtlebot_bringup 3dsensor.launch" />
+</launch>
