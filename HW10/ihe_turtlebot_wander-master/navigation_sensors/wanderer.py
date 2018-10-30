@@ -25,21 +25,24 @@ class Scan_msg:
         self.sect_5 = 0
         keys = [b0+b1+b2+b3+b4 for b0 in range(0,2,1) for b1 in range(0, 11, 10) for b2 in range(0, 101, 100) for b3 in range(0, 1001, 1000) for b4 in range(0, 10001, 10000)]
         ang_increment = 1.7/len(keys)/2
-        foward_increment = 1/len(keys)/2
+        forward_increment = 1/len(keys)/2
         ang_vals = [i * ang_increment for i in range(len(keys)/2)] + [-i * ang_increment for i in range(len(keys)/2)]
         fwd_vals = [i * forward_increment for i in range(len(keys)/2)] + [-i * forward_increment for i in range(len(keys)/2)]  
-        for i in range(len(keys)):
+        self.ang = dict()
+	self.fwd = dict()
+	for i in range(len(keys)):
             key = keys[i]
-            self.ang(key) = ang_vals[i]
-            self.fwd(key) = fwd_vals[i]
-        
-        for key, val in ang_vals:
+            self.ang[key] = ang_vals[i]
+            self.fwd[key] = fwd_vals[i]
+	self.dbgmsg = dict()
+	self.fwd[0] = .02     
+        for key, val in self.ang.iteritems():
             if val == 0:
-                self.dbgmsg(key) = 'Move forward'
+                self.dbgmsg[key] = 'Move forward'
             elif val < 0:
-                self.dbgmsg(key) = 'Veer Right'
+                self.dbgmsg[key] = 'Veer Right'
             elif val > 0:
-                self.dbgmsg(key) = 'Veer Left'
+                self.dbgmsg[key] = 'Veer Left'
         # self.ang = {0:0,1:-1.2,10:-1.2,11:-1.2,100:1.5,101:1.0,110:1.0,111:1.2, 1000:-.5,1001:.5,}
         # self.fwd = {0:.25,1:0,10:0,11:0,100:0.1,101:0,110:0,111:0}
         # self.dbgmsg = {0:'Move forward',1:'Veer right',10:'Veer right',11:'Veer right',100:'Veer left',101:'Veer left',110:'Veer left',111:'Veer right'}
