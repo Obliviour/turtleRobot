@@ -74,7 +74,7 @@ def call_back(scanmsg):
     '''Passes laser scan message to for_callback function of sub_obj.
 
     Parameter scanmsg is laserscan message.'''
-    rospy.loginfo("Callback")
+    rospy.loginfo("Laser Callback")
     sub_obj.for_callback(scanmsg)
 
 def listener():
