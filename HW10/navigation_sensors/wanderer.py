@@ -24,73 +24,73 @@ class Scan_msg:
         self.sect_4 = 0
         self.sect_5 = 0
         self.ang = {00000: 0, 
-					00001: -0.5, 
-					00010: -1.2, 
-					00100: 1.5, 
-					01000: 1.2, 
-					10000: 0.5, 
-					00011: -1.2, 
-					00110: -1.2, 
-					01100: 1.2, 
-					11000: 1.5, 
-					10001: 0, 
-					00111: -1.2, 
-					01110: 1.5, 
-					11100: 1.5, 
-					11001: 1.2, 
-					10011: 0.5, 
-					01111: -1.5, 
-					11110: 1.5, 
-					11101: 0.5, 
-					11011: 0, 
-					10111: -0.5, 
-					11111: 1.7}
+                    00001: -0.5, 
+                    00010: -1.2, 
+                    00100: 1.5, 
+                    01000: 1.2, 
+                    10000: 0.5, 
+                    00011: -1.2, 
+                    00110: -1.2, 
+                    01100: 1.2, 
+                    11000: 1.5, 
+                    10001: 0, 
+                    00111: -1.2, 
+                    01110: 1.5, 
+                    11100: 1.5, 
+                    11001: 1.2, 
+                    10011: 0.5, 
+                    01111: -1.5, 
+                    11110: 1.5, 
+                    11101: 0.5, 
+                    11011: 0, 
+                    10111: -0.5, 
+                    11111: 1.7}
         self.fwd = {00000: 0.25, 
-					00001: 0, 
-					00010: 0, 
-					00100: 0, 
-					01000: 0, 
-					10000: 0, 
-					00011: 0, 
-					00110: 0, 
-					01100: 0, 
-					11000: 0, 
-					10001: 0.25, 
-					00111: 0, 
-					01110: 0, 
-					11100: 0, 
-					11001: 0, 
-					10011: 0, 
-					11110: 0, 
-					11101: 0, 
-					11011: 0.25, 
-					10111: 0,
-					01111: 0, 
-					11111: 0}
+                    00001: 0, 
+                    00010: 0, 
+                    00100: 0, 
+                    01000: 0, 
+                    10000: 0, 
+                    00011: 0, 
+                    00110: 0, 
+                    01100: 0, 
+                    11000: 0, 
+                    10001: 0.25, 
+                    00111: 0, 
+                    01110: 0, 
+                    11100: 0, 
+                    11001: 0, 
+                    10011: 0, 
+                    11110: 0, 
+                    11101: 0, 
+                    11011: 0.25, 
+                    10111: 0,
+                    01111: 0, 
+                    11111: 0}
         self.dbgmsg = {0: 'Move Forward', 
-					   1: 'Veer Right', 
-					   10: 'Veer Right', 
-					   100: 'Veer Left', 
-					   1000: 'Veer Left', 
-					   10000: 'Veer Left', 
-					   11: 'Veer Right', 
-					   110: 'Veer Right', 
-					   1100: 'Veer Left', 
-					   11000: 'Veer Left', 
-					   10001: 'Move Forward', 
-					   111: 'Veer Right', 
-					   1110: 'Veer Left', 
-					   11100: 'Veer Left', 
-					   11001: 'Veer Left', 
-					   10011: 'Veer Left', 
-					   11110: 'Veer Left', 
-					   11101: 'Veer Left', 
-					   11011: 'Move Forward', 
-					   10111: 'Veer Right',
-					   1111: 'Veer Right', 
-					   11111: 'Veer Right'}
+                       1: 'Veer Right', 
+                       10: 'Veer Right', 
+                       100: 'Veer Left', 
+                       1000: 'Veer Left', 
+                       10000: 'Veer Left', 
+                       11: 'Veer Right', 
+                       110: 'Veer Right', 
+                       1100: 'Veer Left', 
+                       11000: 'Veer Left', 
+                       10001: 'Move Forward', 
+                       111: 'Veer Right', 
+                       1110: 'Veer Left', 
+                       11100: 'Veer Left', 
+                       11001: 'Veer Left', 
+                       10011: 'Veer Left', 
+                       11110: 'Veer Left', 
+                       11101: 'Veer Left', 
+                       11011: 'Move Forward', 
+                       10111: 'Veer Right',
+                       1111: 'Veer Right', 
+                       11111: 'Veer Right'}
         
-		# subscriber callbacks
+        # subscriber callbacks
         rospy.Subscriber("/mobile_base/events/bumper", BumperEvent, self.bumper_callback)
         rospy.Subscriber("/mobile_base/events/wheel_drop", WheelDropEvent, self.wheel_callback)
         rospy.Subscriber("/mobile_base/events/cliff",CliffEvent, self.cliff_callback)
@@ -160,14 +160,14 @@ class Scan_msg:
         These are published and the sect variables are reset.'''
         sect = int(str(self.sect_1) + str(self.sect_2) + str(self.sect_3) + str(self.sect_4) + str(self.sect_5))
         rospy.loginfo("Sect = " + str(sect))
-		
+        
         if (self.bhit == 1 or self.wheelhit == 1 or self.cliffhit == 1):
             self.msg.angular.z = 0
             self.msg.linear.x = 0
         else:
-			self.msg.angular.z = self.ang[sect]
-			self.msg.linear.x = self.fwd[sect]
-			rospy.loginfo(self.dbgmsg[sect])
+            self.msg.angular.z = self.ang[sect]
+            self.msg.linear.x = self.fwd[sect]
+            rospy.loginfo(self.dbgmsg[sect])
         self.pub.publish(self.msg)
 
         self.reset_sect()
