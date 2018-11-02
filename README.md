@@ -2,12 +2,12 @@
 
 HW5
 
-GT Other Key: GeorgeP@1927
+
 
 Step 1: check bash file for the following:
 > echo export ROS_MASTER_URI=http://localhost:11311 >> ~/.bashrc
 > echo export ROS_HOSTNAME=IP_OF_TURTLEBOT >> ~/.bashrc
-# IP IS 143.215.102.8
+
 > AND SOURCE OF SETUP.BASH
 Step 2: run the following command
  roslaunch turtlebot_bringup minimal.launch --screen
