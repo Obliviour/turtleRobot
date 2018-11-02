@@ -23,31 +23,74 @@ class Scan_msg:
         self.sect_3 = 0
         self.sect_4 = 0
         self.sect_5 = 0
-        keys = [b0+b1+b2+b3+b4 for b0 in range(0,2,1) for b1 in range(0, 11, 10) for b2 in range(0, 101, 100) for b3 in range(0, 1001, 1000) for b4 in range(0, 10001, 10000)]
-        ang_increment = 1.7/len(keys)/2
-        forward_increment = 1/len(keys)/2
-        ang_vals = [i * ang_increment for i in range(len(keys)/2)] + [-i * ang_increment for i in range(len(keys)/2)]
-        fwd_vals = [i * forward_increment for i in range(len(keys)/2)] + [-i * forward_increment for i in range(len(keys)/2)]  
-        self.ang = dict()
-	self.fwd = dict()
-	for i in range(len(keys)):
-            key = keys[i]
-            self.ang[key] = ang_vals[i]
-            self.fwd[key] = fwd_vals[i]
-	self.dbgmsg = dict()
-	self.fwd[0] = .02     
-        for key, val in self.ang.iteritems():
-            if val == 0:
-                self.dbgmsg[key] = 'Move forward'
-            elif val < 0:
-                self.dbgmsg[key] = 'Veer Right'
-            elif val > 0:
-                self.dbgmsg[key] = 'Veer Left'
-        # self.ang = {0:0,1:-1.2,10:-1.2,11:-1.2,100:1.5,101:1.0,110:1.0,111:1.2, 1000:-.5,1001:.5,}
-        # self.fwd = {0:.25,1:0,10:0,11:0,100:0.1,101:0,110:0,111:0}
-        # self.dbgmsg = {0:'Move forward',1:'Veer right',10:'Veer right',11:'Veer right',100:'Veer left',101:'Veer left',110:'Veer left',111:'Veer right'}
-        # print(keys + ":keys")
-        # subscriber callbacks
+        self.ang = {00000: 0, 
+					00001: -0.5, 
+					00010: -1.2, 
+					00100: 1.5, 
+					01000: 1.2, 
+					10000: 0.5, 
+					00011: -1.2, 
+					00110: -1.2, 
+					01100: 1.2, 
+					11000: 1.5, 
+					10001: 0, 
+					00111: -1.2, 
+					01110: 1.5, 
+					11100: 1.5, 
+					11001: 1.2, 
+					10011: 0.5, 
+					01111: -1.5, 
+					11110: 1.5, 
+					11101: 0.5, 
+					11011: 0, 
+					10111: -0.5, 
+					11111: 1.7}
+        self.fwd = {00000: 0.25, 
+					00001: 0, 
+					00010: 0, 
+					00100: 0, 
+					01000: 0, 
+					10000: 0, 
+					00011: 0, 
+					00110: 0, 
+					01100: 0, 
+					11000: 0, 
+					10001: 0.25, 
+					00111: 0, 
+					01110: 0, 
+					11100: 0, 
+					11001: 0, 
+					10011: 0, 
+					11110: 0, 
+					11101: 0, 
+					11011: 0.25, 
+					10111: 0,
+					01111: 0, 
+					11111: 0}
+        self.dbgmsg = {0: 'Move Forward', 
+					   1: 'Veer Right', 
+					   10: 'Veer Right', 
+					   100: 'Veer Left', 
+					   1000: 'Veer Left', 
+					   10000: 'Veer Left', 
+					   11: 'Veer Right', 
+					   110: 'Veer Right', 
+					   1100: 'Veer Left', 
+					   11000: 'Veer Left', 
+					   10001: 'Move Forward', 
+					   111: 'Veer Right', 
+					   1110: 'Veer Left', 
+					   11100: 'Veer Left', 
+					   11001: 'Veer Left', 
+					   10011: 'Veer Left', 
+					   11110: 'Veer Left', 
+					   11101: 'Veer Left', 
+					   11011: 'Move Forward', 
+					   10111: 'Veer Right',
+					   1111: 'Veer Right', 
+					   11111: 'Veer Right'}
+        
+		# subscriber callbacks
         rospy.Subscriber("/mobile_base/events/bumper", BumperEvent, self.bumper_callback)
         rospy.Subscriber("/mobile_base/events/wheel_drop", WheelDropEvent, self.wheel_callback)
         rospy.Subscriber("/mobile_base/events/cliff",CliffEvent, self.cliff_callback)
@@ -116,11 +159,15 @@ class Scan_msg:
         velocities, and log messages.
         These are published and the sect variables are reset.'''
         sect = int(str(self.sect_1) + str(self.sect_2) + str(self.sect_3) + str(self.sect_4) + str(self.sect_5))
-        rospy.loginfo("Sect = " + str(sect)) 
-        
-        self.msg.angular.z = self.ang[sect]
-        self.msg.linear.x = self.fwd[sect]
-        rospy.loginfo(self.dbgmsg[sect])
+        rospy.loginfo("Sect = " + str(sect))
+		
+        if (self.bhit == 1 or self.wheelhit == 1 or self.cliffhit == 1):
+            self.msg.angular.z = 0
+            self.msg.linear.x = 0
+        else:
+			self.msg.angular.z = self.ang[sect]
+			self.msg.linear.x = self.fwd[sect]
+			rospy.loginfo(self.dbgmsg[sect])
         self.pub.publish(self.msg)
 
         self.reset_sect()
