@@ -19,16 +19,16 @@ class ShowCamera():
         #depth = rospy.Subscriber('/camera/depth/image', Image, self.displayDepth)
         # tell user how to stop TurtleBot
         rospy.loginfo("To stop TurtleBot CTRL + C")
-        rospy.on_shutdown(self.shutdown)
 
         rospy.spin()
 
-    def self.displayRGB(self,msg):
-        rospy.loginfo("Received image data")
+    def displayRGB(self,msg):
+        #rospy.loginfo("Received Image Data")
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg.data, msg.encoding)
-            rospy.loginfo("Converted to cv2 image")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            #rospy.loginfo("Converted to cv2 image")
             cv2.imshow("Image window", cv_image)
+            cv2.waitKey(3)
         except CvBridgeError as e:
             print(e)
 
