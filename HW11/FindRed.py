@@ -14,8 +14,8 @@ class ShowCamera():
         # initiliaze
         rospy.init_node('ShowCamera', anonymous=False)
         self.bridge = CvBridge()
-        self.lower = np.array([17,15,100], dtype = "uint8")
-        self.upper = np.array([50,56,200], dtype = "uint8")
+        self.lower = np.array([50,20,100], dtype = "uint8")
+        self.upper = np.array([75,69,255], dtype = "uint8")
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.displayRGB)
@@ -32,7 +32,8 @@ class ShowCamera():
             mask = cv2.inRange(image, self.lower, self.upper)
             output = cv2.bitwise_and(image, image, mask = mask)
             cv2.imshow("RBG Window", image)
-            cv2.waitKey(1)
+	    cv2.imwrite('TestImage.png',image)
+            cv2.waitKey(0)
 	    #cv2.destroyWindow("RGB Window")
         except CvBridgeError as e:
             print(e)
