@@ -16,7 +16,7 @@ class ShowCamera():
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.displayRGB)
-        #depth = rospy.Subscriber('/camera/depth/image', Image, self.displayDepth)
+        depth = rospy.Subscriber('/camera/depth/image', Image, self.displayDepth)
         # tell user how to stop TurtleBot
         rospy.loginfo("To stop TurtleBot CTRL + C")
 
@@ -27,7 +27,17 @@ class ShowCamera():
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             #rospy.loginfo("Converted to cv2 image")
-            cv2.imshow("Image window", cv_image)
+            cv2.imshow("RBG Window", cv_image)
+            cv2.waitKey(3)
+        except CvBridgeError as e:
+            print(e)
+
+    def displayDepth(self,msg):
+        #rospy.loginfo("Received Image Data")
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            #rospy.loginfo("Converted to cv2 image")
+            cv2.imshow("Depth Window", cv_image)
             cv2.waitKey(3)
         except CvBridgeError as e:
             print(e)
