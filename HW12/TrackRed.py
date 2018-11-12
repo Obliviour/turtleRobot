@@ -36,15 +36,15 @@ class TrackRed:
         rospy.on_shutdown(self.shutdown)
 
         theta_inc = math.pi / 180
-        K = 1
+        K = 0.25
 
         while not rospy.is_shutdown():
-            x_err = -1*self.avg_x
-            rospy.loginfo("Error: " + str(x_err))
+            x_err = 1*self.avg_x
+            #rospy.loginfo("Error: " + str(x_err))
             w = K * x_err * theta_inc
             error_cmd = Twist()
             error_cmd.angular.z = w
-            self.cmd_vel.publish(error_cmd)
+            #self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
         """display rgb information, msg is of type sensor_msgs/Image"""
@@ -52,7 +52,7 @@ class TrackRed:
             self.height = msg.height
             self.width = msg.width
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            rospy.loginfo("Converted color to cv2 image")
+            #rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
             num_pix = sum(sum(mask))
             rospy.loginfo("num_pix: " + str(num_pix))
