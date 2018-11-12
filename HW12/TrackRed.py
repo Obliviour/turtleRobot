@@ -55,7 +55,7 @@ class TrackRed:
             num_pix = sum(sum(mask))
             rospy.loginfo("num_pix: " + str(num_pix))
             if num_pix > self.threshold:
-                self.avg_x, self.avg_y = centroid_np(mask)
+                self.avg_x, self.avg_y = centroid_np2(mask)
                 self.avg_x -= self.width / 2
                 self.avg_y -= self.height / 2
             else:
@@ -78,10 +78,18 @@ class TrackRed:
 
 def centroid_np(arr):
     """finds the centroid of a numpy array"""
-    length = arr.shape[0]
+    new_arr = np.indices(arr.shape[0], arr.shape[1])
+    arr = np.ma.masked_array(new_arr, mask=arr)
+    length_x = arr.shape[0]
+    length_y = arr.shape[1]
     sum_x = np.sum(arr[:, 0])
     sum_y = np.sum(arr[:, 1])
-    return sum_x/length, sum_y/length
+    return sum_x/length_x, sum_y/length_y
+
+
+def centroid_np2(arr):
+    from scipy import ndimage
+    return ndimage.measurements.center_of_mass(arr)
 
 
 if __name__ == '__main__':
