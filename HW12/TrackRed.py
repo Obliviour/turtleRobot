@@ -22,21 +22,27 @@ class TrackRed:
         odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         # tell user how to stop TurtleBot
         self.threshold = 0
-        self.avgx = 0
-        self.avgy = 0
+        self.avg_x = 0
+        self.avg_y = 0
+        self.width = 0
+        self.height = 0
         rospy.loginfo("To stop TurtleBot CTRL + C")
 
         rospy.spin()
 
     def display_rgb(self, msg):
-        """display rgb information"""
+        """display rgb information, msg is of type sensor_msgs/Image"""
         # rospy.loginfo("Received Image Data")
+
         try:
+            self.height = msg.height
+            self.width = msg.width
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
             cv2.imshow("RBG Window", mask)
             cv2.waitKey(1)
+
         except CvBridgeError as e:
             print(e)
 
