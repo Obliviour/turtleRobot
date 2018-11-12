@@ -25,7 +25,8 @@ class TrackRed:
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
-        self.threshold = 50
+        self.percentArea = .1
+	#self.threshold = 50
         self.avg_x = 0
         self.avg_y = 0
         self.width = 0
@@ -54,15 +55,19 @@ class TrackRed:
             mask = cv2.inRange(image, self.lower, self.upper)
             num_pix = sum(sum(mask))
             rospy.loginfo("num_pix: " + str(num_pix))
-            if num_pix > self.threshold:
+            threshold = self.percentArea * self.height * self.width
+	    rospy.loginfo("Threshold: " + str(threshold))
+	    if num_pix > threshold:
                 self.avg_x, self.avg_y = centroid_np(mask)
                 self.avg_x -= self.width / 2
                 self.avg_y -= self.height / 2
             else:
                 self.avg_x = 0
                 self.avg_y = 0
-            cv2.imshow("RBG Window", mask)
-            cv2.waitKey(1)
+	    rospy.loginfo("Avg X: " + str(self.avg_x))
+	    rospy.loginfo("Avg Y: " + str(self.avg_y))
+            #cv2.imshow("RBG Window", mask)
+            #cv2.waitKey(1)
 
         except CvBridgeError as e:
             print(e)
