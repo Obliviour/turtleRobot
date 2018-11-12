@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 
-class ShowCamera():
+class TrackRed():
     def __init__(self):
         # initiliaze
         rospy.init_node('ShowCamera', anonymous=False)
@@ -19,7 +19,11 @@ class ShowCamera():
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.displayRGB)
+        odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         # tell user how to stop TurtleBot
+        self.threshold = 0
+        self.avgx = 0
+        self.avgy = 0
         rospy.loginfo("To stop TurtleBot CTRL + C")
 
         rospy.spin()
@@ -30,11 +34,8 @@ class ShowCamera():
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
-            #output = cv2.bitwise_and(image, image, mask = mask)
             cv2.imshow("RBG Window", mask)
-	    #cv2.imwrite('TestImage.png',image)
             cv2.waitKey(1)
-	    #cv2.destroyWindow("RGB Window")
         except CvBridgeError as e:
             print(e)
 
