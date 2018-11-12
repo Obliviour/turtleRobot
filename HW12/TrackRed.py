@@ -20,13 +20,15 @@ class TrackRed():
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.displayRGB)
         odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
+        cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
         self.threshold = 0
         self.avgx = 0
         self.avgy = 0
         rospy.loginfo("To stop TurtleBot CTRL + C")
+        rospy.on_shutdown(self.shutdown)
 
-        rospy.spin()
+        while not rospy.is_shutdown():
 
     def displayRGB(self,msg):
         #rospy.loginfo("Received Image Data")
@@ -38,6 +40,15 @@ class TrackRed():
             cv2.waitKey(1)
         except CvBridgeError as e:
             print(e)
+
+    def shutdown(self):
+        # stop turtlebot
+        rospy.loginfo("Stop TurtleBot")
+        # a default Twist has linear.x of 0 and angular.z of 0.  So it'll stop TurtleBot
+        self.cmd_vel.publish(Twist())
+        # sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
+        rospy.sleep(1)
+
 
 if __name__ == '__main__':
     #try:
