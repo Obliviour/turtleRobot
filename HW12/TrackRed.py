@@ -53,7 +53,7 @@ class TrackRed:
             rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
             num_pix = sum(sum(mask))
-            rospy.loginfo(f"{num_pix}")
+            rospy.loginfo("num_pix: " + num_pix)
             if num_pix > self.threshold:
                 self.avg_x, self.avg_y = centroid_np(mask)
                 self.avg_x -= self.width / 2
