@@ -59,7 +59,7 @@ class TrackRed:
             threshold = self.percentArea * self.height * self.width
             rospy.loginfo("Threshold: " + str(threshold))
             if num_pix > threshold:
-                self.avg_x, self.avg_y = centroid_np(mask)
+                self.avg_x, self.avg_y = centroid_np2(mask)
                 self.avg_x -= self.width / 2
                 self.avg_y -= self.height / 2
             else:
