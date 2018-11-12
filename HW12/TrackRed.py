@@ -39,12 +39,12 @@ class TrackRed:
         K = 0.25
 
         while not rospy.is_shutdown():
-            x_err = 1*self.avg_x
-            #rospy.loginfo("Error: " + str(x_err))
+            x_err = -1*self.avg_x
+            rospy.loginfo("Error: " + str(x_err))
             w = K * x_err * theta_inc
             error_cmd = Twist()
             error_cmd.angular.z = w
-            #self.cmd_vel.publish(error_cmd)
+            self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
         """display rgb information, msg is of type sensor_msgs/Image"""
@@ -59,17 +59,18 @@ class TrackRed:
             threshold = self.percentArea * self.height * self.width
             rospy.loginfo("Threshold: " + str(threshold))
             if num_pix > threshold:
-                self.avg_x, self.avg_y = centroid_np2(mask)
+                self.avg_y, self.avg_x = centroid_np2(mask)
                 self.avg_x -= self.width / 2
                 self.avg_y -= self.height / 2
+		self.avg_y = -self.avg_y
             else:
                 self.avg_x = 0
                 self.avg_y = 0
             rospy.loginfo("Avg X: " + str(self.avg_x))
             rospy.loginfo("Avg Y: " + str(self.avg_y))
-            #cv2.imshow("RBG Window", mask)
-            #cv2.waitKey(1)
-
+            # cv2.imshow("RBG Window", mask)
+            # cv2.waitKey(1)
+            # time.sleep(1)
         except CvBridgeError as e:
             print(e)
 
