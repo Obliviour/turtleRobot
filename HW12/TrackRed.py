@@ -23,7 +23,6 @@ class TrackRed:
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
-        odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
         self.threshold = 50
@@ -35,20 +34,18 @@ class TrackRed:
         rospy.loginfo("To stop TurtleBot CTRL + C")
         rospy.on_shutdown(self.shutdown)
 
-        theta_inc = math.pi()/180
+        theta_inc = math.pi / 180
         K = 1
 
         while not rospy.is_shutdown():
-        	x_err = (self.width/2) - self.avg_x
-        	w = K * x_err * theta_inc 
-        	error_cmd = Twist()
+            x_err = (self.width/2) - self.avg_x
+            w = K * x_err * theta_inc
+            error_cmd = Twist()
             error_cmd.angular.z = w
             self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
         """display rgb information, msg is of type sensor_msgs/Image"""
-        # rospy.loginfo("Received Image Data")
-
         try:
             self.height = msg.height
             self.width = msg.width
@@ -77,12 +74,14 @@ class TrackRed:
         # sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
         rospy.sleep(1)
 
+
 def centroid_np(arr):
+    """finds the centroid of a numpy array"""
     length = arr.shape[0]
     sum_x = np.sum(arr[:, 0])
     sum_y = np.sum(arr[:, 1])
     return sum_x/length, sum_y/length
 
+
 if __name__ == '__main__':
-    #try:
     TrackRed()
