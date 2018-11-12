@@ -52,7 +52,8 @@ class TrackRed:
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
-            num_pix = sum(mask)
+            num_pix = sum(sum(mask))
+            rospy.loginfo(f"{num_pix}")
             if num_pix > self.threshold:
                 self.avg_x, self.avg_y = centroid_np(mask)
                 self.avg_x -= self.width / 2
