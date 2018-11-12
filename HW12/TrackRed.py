@@ -39,9 +39,9 @@ class TrackRed:
         K = 1
 
         while not rospy.is_shutdown():
-        	x_err = (self.width/2) - self.avg_x
-        	w = K * x_err * theta_inc 
-        	error_cmd = Twist()
+            x_err = (self.width/2) - self.avg_x
+            w = K * x_err * theta_inc 
+            error_cmd = Twist()
             error_cmd.angular.z = w
             self.cmd_vel.publish(error_cmd)
 
