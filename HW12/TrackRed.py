@@ -7,6 +7,10 @@ import numpy as np
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion, Twist
+import cmath
+import math
 
 
 class TrackRed:
@@ -20,17 +24,26 @@ class TrackRed:
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
         odom = rospy.Subscriber('odom', Odometry, self.OdometryCallBack)
-        cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
+        self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
         self.threshold = 0
         self.avg_x = 0
         self.avg_y = 0
         self.width = 0
         self.height = 0
+        self.gotOrigAngle = 0
         rospy.loginfo("To stop TurtleBot CTRL + C")
         rospy.on_shutdown(self.shutdown)
 
+        theta_inc = math.pi()/180
+        K = 1
+
         while not rospy.is_shutdown():
+        	x_err = (self.width/2) - self.avg_x
+        	w = K * x_err * theta_inc 
+        	error_cmd = Twist()
+            error_cmd.angular.z = w
+            self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
         """display rgb information, msg is of type sensor_msgs/Image"""
@@ -58,4 +71,4 @@ class TrackRed:
 
 if __name__ == '__main__':
     #try:
-    ShowCamera()
+    TrackRed()
