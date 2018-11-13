@@ -36,14 +36,17 @@ class TrackRed:
         rospy.on_shutdown(self.shutdown)
 
         theta_inc = math.pi / 180
-        K = 0.25
+        K_Rot = 0.5
+        K_Lin = 0.25
 
         while not rospy.is_shutdown():
-            x_err = -1*self.avg_x
-            rospy.loginfo("Error: " + str(x_err))
-            w = K * x_err * theta_inc
+            x_err = -1 * self.avg_x
+            y_err = -1 * self.avg_y
+            w = K_Rot * x_err * theta_inc
+            lin = K_Lin * y_err
             error_cmd = Twist()
             error_cmd.angular.z = w
+            error_cmd.linear.x = lin
             self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
