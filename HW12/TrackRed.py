@@ -20,14 +20,14 @@ class TrackRed:
         self.bridge = CvBridge()
         #truck lower [10 1 100]
         #truck upper [38 15 255]
-        self.lower = np.array([0,225,0], dtype = "uint8")
-        self.upper = np.array([0,255,15], dtype = "uint8")
+        self.lower = np.array([150,225,40], dtype = "uint8")
+        self.upper = np.array([240,255,60], dtype = "uint8")
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
-        self.percentArea = .1
+        self.percentArea = .05
         # self.threshold = 50
         self.avg_x = 0
         self.avg_y = 0
@@ -73,8 +73,8 @@ class TrackRed:
                 self.avg_y = 0
             rospy.loginfo("Avg X: " + str(self.avg_x))
             rospy.loginfo("Avg Y: " + str(self.avg_y))
-            # cv2.imshow("RBG Window", mask)
-            # cv2.waitKey(1)
+            cv2.imshow("RBG Window", mask)
+            cv2.waitKey(1)
             # time.sleep(1)
         except CvBridgeError as e:
             print(e)
