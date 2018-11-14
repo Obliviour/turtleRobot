@@ -18,8 +18,10 @@ class TrackRed:
         # initialize
         rospy.init_node('ShowCamera', anonymous=False)
         self.bridge = CvBridge()
-        self.lower = np.array([10,1,100], dtype = "uint8")
-        self.upper = np.array([38,15,255], dtype = "uint8")
+        #truck lower [10 1 100]
+        #truck upper [38 15 255]
+        self.lower = np.array([0,225,0], dtype = "uint8")
+        self.upper = np.array([0,255,15], dtype = "uint8")
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
@@ -46,7 +48,7 @@ class TrackRed:
             lin = K_Lin * y_err
             error_cmd = Twist()
             error_cmd.angular.z = w
-            error_cmd.linear.x = lin
+            #error_cmd.linear.x = lin
             self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
