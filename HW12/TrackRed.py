@@ -20,27 +20,27 @@ class TrackRed:
         self.bridge = CvBridge()
         #truck lower [10 1 100]
         #truck upper [38 15 255]
-        self.lower = np.array([150,225,40], dtype = "uint8")
-        self.upper = np.array([240,255,60], dtype = "uint8")
+        self.lower = np.array([10,1,100], dtype = "uint8")
+        self.upper = np.array([38,15,255], dtype = "uint8")
         # rospy.init_node('CheckOdometry', anonymous=False)
         # we want a straight line with a phase of straight
         rgb = rospy.Subscriber('/camera/rgb/image_raw', Image, self.display_rgb)
         self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
         # tell user how to stop TurtleBot
-        self.percentArea = .05
+        self.percentArea = .1
         # self.threshold = 50
         self.avg_x = 0
         self.avg_y = 0
         self.width = 0
         self.height = 0
         self.gotOrigAngle = 0
-        rospy.loginfo("To stop TurtleBot CTRL + C")
+        #rospy.loginfo("To stop TurtleBot CTRL + C")
         rospy.on_shutdown(self.shutdown)
 
         theta_inc = math.pi / 180
         lin_inc = 0.01
         K_Rot = 0.5
-        K_Lin = 0.5
+        K_Lin = 0.1
 
         while not rospy.is_shutdown():
             x_err = -1 * self.avg_x
@@ -61,9 +61,9 @@ class TrackRed:
             #rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
             num_pix = sum(sum(mask))
-            rospy.loginfo("num_pix: " + str(num_pix))
+            #rospy.loginfo("num_pix: " + str(num_pix))
             threshold = self.percentArea * self.height * self.width
-            rospy.loginfo("Threshold: " + str(threshold))
+            #rospy.loginfo("Threshold: " + str(threshold))
             if num_pix > threshold:
                 self.avg_y, self.avg_x = centroid_np2(mask)
                 self.avg_x -= self.width / 2
@@ -72,8 +72,8 @@ class TrackRed:
             else:
                 self.avg_x = 0
                 self.avg_y = 0
-            rospy.loginfo("Avg X: " + str(self.avg_x))
-            rospy.loginfo("Avg Y: " + str(self.avg_y))
+            #rospy.loginfo("Avg X: " + str(self.avg_x))
+            #rospy.loginfo("Avg Y: " + str(self.avg_y))
             cv2.imshow("RBG Window", mask)
             cv2.waitKey(1)
             # time.sleep(1)
