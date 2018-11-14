@@ -38,14 +38,15 @@ class TrackRed:
         rospy.on_shutdown(self.shutdown)
 
         theta_inc = math.pi / 180
+        lin_inc = 0.01
         K_Rot = 0.5
-        K_Lin = 0.05
+        K_Lin = 0.5
 
         while not rospy.is_shutdown():
             x_err = -1 * self.avg_x
             y_err = -1 * self.avg_y
             w = K_Rot * x_err * theta_inc
-            lin = K_Lin * y_err
+            lin = K_Lin * y_err * lin_inc
             error_cmd = Twist()
             error_cmd.angular.z = w
             error_cmd.linear.x = lin
