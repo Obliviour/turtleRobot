@@ -74,8 +74,8 @@ class TrackRed:
                 self.avg_y = 0
             #rospy.loginfo("Avg X: " + str(self.avg_x))
             #rospy.loginfo("Avg Y: " + str(self.avg_y))
-            cv2.imshow("RBG Window", mask)
-            cv2.waitKey(1)
+            #cv2.imshow("RBG Window", mask)
+            #cv2.waitKey(1)
             # time.sleep(1)
         except CvBridgeError as e:
             print(e)
