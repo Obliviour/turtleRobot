@@ -54,7 +54,7 @@ class TrackRed:
             if self.set_depth and self.set_rgb:
                 mask = self.depth_image[self.rgb_image]
                 # mask = np.bitwise_and(self.depth_mask, image)
-                num_pix = sum(sum(mask))
+                num_pix = sum(sum(self.rgb_image))
                 print(num_pix)
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
