@@ -18,8 +18,8 @@ class TrackRed:
         # initialize
         rospy.init_node('ShowCamera', anonymous=False)
         self.bridge = CvBridge()
-        #truck lower [10 1 100]
-        #truck upper [38 15 255]
+        # truck lower [10 1 100]
+        # truck upper [38 15 255]
         self.lower = np.array([10,1,100], dtype = "uint8")
         self.upper = np.array([38,15,255], dtype = "uint8")
         # rospy.init_node('CheckOdometry', anonymous=False)
@@ -64,30 +64,30 @@ class TrackRed:
             self.height = msg.height
             self.width = msg.width
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            #rospy.loginfo("Converted color to cv2 image")
+            # rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
             if self.is_set:
                 self.depth_mask = mask
 
-            #rospy.loginfo("Avg X: " + str(self.avg_x))
-            #rospy.loginfo("Avg Y: " + str(self.avg_y))
-            #cv2.imshow("RBG Window", mask)
-            #cv2.waitKey(1)
+            # rospy.loginfo("Avg X: " + str(self.avg_x))
+            # rospy.loginfo("Avg Y: " + str(self.avg_y))
+            # cv2.imshow("RBG Window", mask)
+            # cv2.waitKey(1)
             # time.sleep(1)
         except CvBridgeError as e:
             print(e)
 
     def display_depth(self, msg):
-        #rospy.loginfo("Received Image Data")
+        # rospy.loginfo("Received Image Data")
         try:
             if self.is_set:
                 image = self.bridge.imgmsg_to_cv2(msg)
                 rospy.loginfo("Converted depth to cv2 image")
-                mask = self.depth_mask & image
+                mask = np.bitwise_and(self.depth_mask,image)
                 num_pix = sum(sum(mask))
-                #rospy.loginfo("num_pix: " + str(num_pix))
+                # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
-                #rospy.loginfo("Threshold: " + str(threshold))
+                # rospy.loginfo("Threshold: " + str(threshold))
                 if num_pix > threshold:
                     self.avg_y, self.avg_x = centroid_np2(mask)
                     self.avg_x -= self.width / 2
