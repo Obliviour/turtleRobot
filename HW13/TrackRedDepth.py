@@ -52,7 +52,6 @@ class TrackRed:
         while not rospy.is_shutdown():
 
             if self.set_depth and self.set_rgb:
-                self.depth_image[np.isnan(self.depth_image)] = 0
                 mask = self.depth_image[self.rgb_image]
                 # mask = np.bitwise_and(self.depth_mask, image)
                 num_pix = sum(sum(mask))
@@ -102,14 +101,16 @@ class TrackRed:
         # rospy.loginfo("Received Image Data")
         try:
             image = self.bridge.imgmsg_to_cv2(msg)
+            image[np.isnan(image)] = 0
             self.depth_image = image
+            #self.depth_image = image
             self.set_depth = 1
             rospy.loginfo("Converted depth to cv2 image")
             #mask = image[self.depth_mask]
             #mask = np.bitwise_and(self.depth_mask, image)
             #num_pix = sum(sum(self.depth_mask))
             # rospy.loginfo("num_pix: " + str(num_pix))
-            threshold = self.percentArea * self.height * self.width
+            #threshold = self.percentArea * self.height * self.width
             # rospy.loginfo("Threshold: " + str(threshold))
            # print(num_pix)
 
