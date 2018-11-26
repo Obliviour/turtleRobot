@@ -55,7 +55,7 @@ class TrackRed:
                 mask = self.depth_image[self.rgb_image]
                 # mask = np.bitwise_and(self.depth_mask, image)
                 num_pix = sum(sum(mask))
-
+                print(num_pix)
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
                 # rospy.loginfo("Threshold: " + str(threshold))
@@ -75,6 +75,8 @@ class TrackRed:
                 error_cmd.angular.z = w
                 error_cmd.linear.x = lin
                 self.cmd_vel.publish(error_cmd)
+                self.set_rgb = 0
+                self.set_depth = 0
 
 
     def display_rgb(self, msg):
