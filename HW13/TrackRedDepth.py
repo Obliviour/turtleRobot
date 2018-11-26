@@ -46,9 +46,9 @@ class TrackRed:
         K_Lin = 0.1
 
         while not rospy.is_shutdown():
-            if self.width != 0 and ~self.is_set:
-                self.depth_mask = np.zeros([self.width, self.height])
-                self.is_set = 1
+            #if self.width != 0 and ~self.is_set:
+            #    self.depth_mask = np.zeros([self.width, self.height])
+            #    self.is_set = 1
             x_err = -1 * self.avg_x
             y_err = -1 * self.avg_y
             w = K_Rot * x_err * theta_inc
@@ -66,9 +66,9 @@ class TrackRed:
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             # rospy.loginfo("Converted color to cv2 image")
             mask = cv2.inRange(image, self.lower, self.upper)
-            if self.is_set:
-                self.depth_mask = mask
-
+            #if self.is_set:
+            self.depth_mask = mask
+	    self.is_set = 1
             # rospy.loginfo("Avg X: " + str(self.avg_x))
             # rospy.loginfo("Avg Y: " + str(self.avg_y))
             # cv2.imshow("RBG Window", mask)
@@ -86,12 +86,13 @@ class TrackRed:
                 self.depth_mask = np.array(self.depth_mask)
                 mask = np.array(image[self.depth_mask])
                 #mask = np.bitwise_and(self.depth_mask, image)
-                num_pix = sum(sum(mask))
+                num_pix = sum(sum(self.depth_mask))
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
                 # rospy.loginfo("Threshold: " + str(threshold))
-                if num_pix > threshold:
-                    self.avg_y, self.avg_x = centroid_np2(mask)
+                print(num_pix)
+		if num_pix > threshold:
+                    self.avg_y, self.avg_x = centroid_np2(self.depth_mask)
                     self.avg_x -= self.width / 2
                     self.avg_y -= self.height / 2
                     self.avg_y = -self.avg_y
