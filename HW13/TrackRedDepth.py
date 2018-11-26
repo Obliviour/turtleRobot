@@ -101,7 +101,7 @@ class TrackRed:
         # rospy.loginfo("Received Image Data")
         try:
             image = self.bridge.imgmsg_to_cv2(msg)
-            temp = image
+            temp = np.copy(image)
             temp[np.isnan(temp)] = 0
             self.depth_image = temp
             #self.depth_image = image
