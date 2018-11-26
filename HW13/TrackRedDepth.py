@@ -45,35 +45,47 @@ class TrackRed:
         rospy.on_shutdown(self.shutdown)
 
         theta_inc = math.pi / 180
-        lin_inc = 0.01
-        K_Rot = 0.5
-        K_Lin = 0.1
+        lin_inc = 0.5
+        K_Rot = 0.01
+        K_Lin = 0.01
 
         while not rospy.is_shutdown():
 
             if self.set_depth and self.set_rgb:
-                mask = self.depth_image[self.rgb_image]
+                #mask = self.rgb_image > 0
                 # mask = np.bitwise_and(self.depth_mask, image)
-                num_pix = sum(sum(self.rgb_image))
-                print(mask.shape)
+                temp = np.copy(self.depth_image)
+		#cv2.imshow("Depth",self.rgb_image)
+		#cv2.waitKey(1)
+		temp[self.rgb_image < 1] = 0 
+		cv2.imshow("Depth",temp)
+		cv2.waitKey(1)
+		num_pix = sum(sum(self.rgb_image))
+                #print(temp.shape)
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
-                # rospy.loginfo("Threshold: " + str(threshold))
-                if num_pix > threshold:
-                    self.avg_y, self.avg_x = centroid_np2(mask)
+                #rospy.loginfo("Threshold: " + str(threshold))
+                curr_depth = 0
+		if num_pix > threshold:
+                    self.avg_y, self.avg_x = centroid_np2(temp)
+		    curr_depth = np.mean(temp[self.rgb_image>0])
+		    rospy.loginfo("Depth: " + str(curr_depth))
                     self.avg_x -= self.width / 2
                     self.avg_y -= self.height / 2
-                    self.avg_y = -self.avg_y
+                    #self.avg_y = -self.avg_y
+		    valid_depth = 1
                 else:
                     self.avg_x = 0
-                    self.avg_y = 0
+                    valid_depth = 0
+  		    curr_depth = 0
                 x_err = -1 * self.avg_x
-                y_err = -1 * self.avg_y
+                y_err = valid_depth*(curr_depth - 0.175)
                 w = K_Rot * x_err * theta_inc
                 lin = K_Lin * y_err * lin_inc
                 error_cmd = Twist()
                 error_cmd.angular.z = w
                 error_cmd.linear.x = lin
+		#rospy.loginfo("lin: " + str(lin))
                 self.cmd_vel.publish(error_cmd)
                 self.set_rgb = 0
                 self.set_depth = 0
@@ -91,8 +103,8 @@ class TrackRed:
             self.set_rgb = 1
             # rospy.loginfo("Avg X: " + str(self.avg_x))
             # rospy.loginfo("Avg Y: " + str(self.avg_y))
-            # cv2.imshow("RBG Window", mask)
-            # cv2.waitKey(1)
+            #cv2.imshow("RBG Window", self.rgb_image)
+            #cv2.waitKey(1)
             # time.sleep(1)
         except CvBridgeError as e:
             print(e)
@@ -103,10 +115,11 @@ class TrackRed:
             image = self.bridge.imgmsg_to_cv2(msg)
             temp = np.copy(image)
             temp[np.isnan(temp)] = 0
-            self.depth_image = temp
+            temp = np.reshape(temp,[480,640])
+	    self.depth_image = temp
             #self.depth_image = image
             self.set_depth = 1
-            rospy.loginfo("Converted depth to cv2 image")
+            #rospy.loginfo("Converted depth to cv2 image")
             #mask = image[self.depth_mask]
             #mask = np.bitwise_and(self.depth_mask, image)
             #num_pix = sum(sum(self.depth_mask))
