@@ -104,6 +104,7 @@ class TrackRed:
             self.depth_image = image
             self.set_depth = 1
             rospy.loginfo("Converted depth to cv2 image")
+            print(self.depth_image)
             #mask = image[self.depth_mask]
             #mask = np.bitwise_and(self.depth_mask, image)
             #num_pix = sum(sum(self.depth_mask))
