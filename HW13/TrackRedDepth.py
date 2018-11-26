@@ -38,25 +38,8 @@ class TrackRed:
         self.is_set = 0
         # self.depth_mask = 0
         # rospy.loginfo("To stop TurtleBot CTRL + C")
-        rospy.on_shutdown(self.shutdown)
+        rospy.spin()
 
-        theta_inc = math.pi / 180
-        lin_inc = 0.01
-        K_Rot = 0.5
-        K_Lin = 0.1
-
-        while not rospy.is_shutdown():
-            #if self.width != 0 and ~self.is_set:
-            #    self.depth_mask = np.zeros([self.width, self.height])
-            #    self.is_set = 1
-            x_err = -1 * self.avg_x
-            y_err = -1 * self.avg_y
-            w = K_Rot * x_err * theta_inc
-            lin = K_Lin * y_err * lin_inc
-            error_cmd = Twist()
-            error_cmd.angular.z = w
-            error_cmd.linear.x = lin
-            self.cmd_vel.publish(error_cmd)
 
     def display_rgb(self, msg):
         """display rgb information, msg is of type sensor_msgs/Image"""
@@ -65,10 +48,9 @@ class TrackRed:
             self.width = msg.width
             image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             # rospy.loginfo("Converted color to cv2 image")
-            mask = cv2.inRange(image, self.lower, self.upper)
             #if self.is_set:
-            self.depth_mask = mask
-	    self.is_set = 1
+            self.depth_mask = cv2.inRange(image, self.lower, self.upper)
+            self.is_set = 1
             # rospy.loginfo("Avg X: " + str(self.avg_x))
             # rospy.loginfo("Avg Y: " + str(self.avg_y))
             # cv2.imshow("RBG Window", mask)
@@ -83,15 +65,15 @@ class TrackRed:
             if self.is_set:
                 image = self.bridge.imgmsg_to_cv2(msg)
                 rospy.loginfo("Converted depth to cv2 image")
-                self.depth_mask = np.array(self.depth_mask)
-                mask = np.array(image[self.depth_mask])
+                mask = image[self.depth_mask]
                 #mask = np.bitwise_and(self.depth_mask, image)
                 num_pix = sum(sum(self.depth_mask))
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
                 # rospy.loginfo("Threshold: " + str(threshold))
                 print(num_pix)
-		if num_pix > threshold:
+
+                if num_pix > threshold:
                     self.avg_y, self.avg_x = centroid_np2(self.depth_mask)
                     self.avg_x -= self.width / 2
                     self.avg_y -= self.height / 2
@@ -101,6 +83,18 @@ class TrackRed:
                     self.avg_y = 0
                 # cv2.imshow("Depth Window", image)
                 # cv2.waitKey(1)
+                theta_inc = math.pi / 180
+                lin_inc = 0.01
+                K_Rot = 0.5
+                K_Lin = 0.1
+                x_err = -1 * self.avg_x
+                y_err = -1 * self.avg_y
+                w = K_Rot * x_err * theta_inc
+                lin = K_Lin * y_err * lin_inc
+                error_cmd = Twist()
+                error_cmd.angular.z = w
+                error_cmd.linear.x = lin
+                self.cmd_vel.publish(error_cmd)
         # cv2.destroyWindow("Depth Window")
         except CvBridgeError as e:
             print(e)
