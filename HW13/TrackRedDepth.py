@@ -84,8 +84,8 @@ class TrackRed:
                 image = self.bridge.imgmsg_to_cv2(msg)
                 rospy.loginfo("Converted depth to cv2 image")
                 self.depth_mask = np.array(self.depth_mask)
-                image = np.array(image)
-                mask = np.bitwise_and(self.depth_mask, image)
+                mask = np.array(image[self.depth_mask])
+                #mask = np.bitwise_and(self.depth_mask, image)
                 num_pix = sum(sum(mask))
                 # rospy.loginfo("num_pix: " + str(num_pix))
                 threshold = self.percentArea * self.height * self.width
